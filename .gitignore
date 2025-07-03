@@ -1,4 +1,39 @@
-/.clj-kondo
-/.cpcache
+# Clojure
 /classes
-/install-clj-kondo
+/target
+.nrepl-port
+.cpcache
+
+# Build artifacts
+out/
+build/
+dist/
+
+# Dependency directories
+/lib
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.clj-kondo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Documentation build folders
+doc/build/
+
+# Other
+tmp/
+*.bak
+*.backup
