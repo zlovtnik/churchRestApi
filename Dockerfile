@@ -1,10 +1,10 @@
-FROM clojure:openjdk-11-lein AS builder
+FROM clojure:openjdk-11-tools-deps AS builder
 
 WORKDIR /app
 
 COPY . /app
 
-RUN lein uberjar
+RUN clojure -T:build uber
 
 FROM openjdk:11-jre-slim
 
