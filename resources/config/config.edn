@@ -1,0 +1,8 @@
+{:app-name "My App"
+ :server {:port 8080}
+ :db {:dbtype "postgresql"
+      :dbname "myapp_dev"
+      :host "localhost"
+      :user "postgres"
+      :password "postgres"}
+ :jwt {:secret "your-jwt-secret-here"}}

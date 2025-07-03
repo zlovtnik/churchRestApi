@@ -1,0 +1,31 @@
+{:paths ["src" "resources" "test"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        ring/ring-core {:mvn/version "1.9.6"}
+        ring/ring-json {:mvn/version "0.5.1"}
+        ring/ring-defaults {:mvn/version "0.3.4"}
+        ring/ring-jetty-adapter {:mvn/version "1.9.6"}
+        compojure/compojure {:mvn/version "1.7.0"}
+        buddy/buddy-sign {:mvn/version "3.4.333"}
+        buddy/buddy-hashers {:mvn/version "1.8.158"}
+        buddy/buddy-auth {:mvn/version "3.0.323"}
+        prismatic/schema {:mvn/version "1.4.1"}
+        ring-cors/ring-cors {:mvn/version "0.1.13"}
+        ring/ring-ssl {:mvn/version "0.3.0"}
+        cheshire/cheshire {:mvn/version "5.11.0"}
+        mount/mount {:mvn/version "0.1.16"}
+        aero/aero {:mvn/version "1.1.6"}
+        com.github.seancorfield/next.jdbc {:mvn/version "1.3.883"}
+        hikari-cp/hikari-cp {:mvn/version "2.13.0"}
+        org.postgresql/postgresql {:mvn/version "42.6.0"}
+        migratus/migratus {:mvn/version "1.4.9"}
+        clj-time/clj-time {:mvn/version "0.15.2"}
+        ring-logger/ring-logger {:mvn/version "1.1.1"}
+        metrics-clojure/metrics-clojure {:mvn/version "2.10.0"}
+        funcool/cats {:mvn/version "2.2.0"}
+        cloverage/cloverage {:mvn/version "1.2.4"}
+        com.taoensso/timbre {:mvn/version "6.5.0"}}
+ :aliases {
+  :coverage {:extra-deps {cloverage/cloverage {:mvn/version "1.2.4"}}
+             :main-opts ["-m" "cloverage.coverage" "--ns-regex" ".*"]}}
+ :profiles {:dev {:dependencies [[jonase/eastwood {:mvn/version "1.4.3"}]]}}
+ :mvn/repos {"clojars" {:url "https://clojars.org/repo"}}}
