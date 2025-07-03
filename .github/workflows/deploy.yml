@@ -28,12 +28,3 @@ jobs:
     - name: Build application
       run: clojure -T:build uber
 
-    - name: Deploy to Heroku
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "GitHub Actions"
-        git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/church-api.git
-        git push heroku main
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
