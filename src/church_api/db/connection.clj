@@ -1,5 +1,5 @@
 (ns church-api.db.connection
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [next.jdbc :as jdbc]
             [environ.core :refer [env]])
   (:import (com.zaxxer.hikari HikariConfig HikariDataSource)))
 
@@ -20,7 +20,7 @@
   @datasource)
 
 (defmacro with-db-connection [bindings & body]
-  `(jdbc/with-db-connection [~@bindings (get-datasource)]
+  `(jdbc/with-transaction [~@bindings (get-datasource)]
      ~@body))
 
 (defn close-db []

@@ -1,47 +1,47 @@
 (ns church-api.db.users
-  (:require [clojure.java.jdbc :as jdbc]
-            [church-api.db.connection :refer [with-db-connection get-datasource]]))
-
-(def users-table-ddl
-  (jdbc/create-table-ddl :users
-                         [[:id :serial "PRIMARY KEY"]
-                          [:username :varchar "NOT NULL UNIQUE"]
-                          [:email :varchar "NOT NULL UNIQUE"]
-                          [:password_hash :varchar "NOT NULL"]
-                          [:first_name :varchar]
-                          [:last_name :varchar]
-                          [:created_at :timestamp "NOT NULL DEFAULT CURRENT_TIMESTAMP"]
-                          [:updated_at :timestamp "NOT NULL DEFAULT CURRENT_TIMESTAMP"]]))
+  (:require [next.jdbc :as jdbc]
+            [next.jdbc.sql :as sql]
+            [church-api.db.connection :refer [get-datasource]]))
 
 (defn init-users-table []
-  (with-db-connection [conn (get-datasource)]
-    (jdbc/db-do-commands conn users-table-ddl)
+  (let [ds (get-datasource)]
+    (jdbc/execute-one! ds
+                     ["CREATE TABLE IF NOT EXISTS users (
+                      id SERIAL PRIMARY KEY,
+                      username VARCHAR NOT NULL UNIQUE,
+                      email VARCHAR NOT NULL UNIQUE,
+                      password_hash VARCHAR NOT NULL,
+                      first_name VARCHAR,
+                      last_name VARCHAR,
+                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )"])
     (println "Users table created.")))
 
 (defn create-user [user-data]
-  (with-db-connection [conn (get-datasource)]
-    (jdbc/insert! conn :users user-data)))
+  (let [ds (get-datasource)]
+    (sql/insert! ds :users user-data)))
 
 (defn get-user-by-id [id]
-  (with-db-connection [conn (get-datasource)]
-    (first (jdbc/query conn ["SELECT * FROM users WHERE id = ?" id]))))
+  (let [ds (get-datasource)]
+    (jdbc/execute-one! ds ["SELECT * FROM users WHERE id = ?" id])))
 
 (defn get-user-by-username [username]
-  (with-db-connection [conn (get-datasource)]
-    (first (jdbc/query conn ["SELECT * FROM users WHERE username = ?" username]))))
+  (let [ds (get-datasource)]
+    (jdbc/execute-one! ds ["SELECT * FROM users WHERE username = ?" username])))
 
 (defn get-user-by-email [email]
-  (with-db-connection [conn (get-datasource)]
-    (first (jdbc/query conn ["SELECT * FROM users WHERE email = ?" email]))))
+  (let [ds (get-datasource)]
+    (jdbc/execute-one! ds ["SELECT * FROM users WHERE email = ?" email])))
 
 (defn get-all-users []
-  (with-db-connection [conn (get-datasource)]
-    (jdbc/query conn ["SELECT * FROM users"])))
+  (let [ds (get-datasource)]
+    (jdbc/execute! ds ["SELECT * FROM users"])))
 
 (defn update-user [id updates]
-  (with-db-connection [conn (get-datasource)]
-    (jdbc/update! conn :users updates ["id = ?" id])))
+  (let [ds (get-datasource)]
+    (sql/update! ds :users updates {:id id})))
 
 (defn delete-user [id]
-  (with-db-connection [conn (get-datasource)]
-    (jdbc/delete! conn :users ["id = ?" id])))
+  (let [ds (get-datasource)]
+    (sql/delete! ds :users {:id id})))

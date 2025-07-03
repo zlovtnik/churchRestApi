@@ -3,21 +3,8 @@
             [cats.builtin]
             [cats.protocols :as p]))
 
-(defrecord Result [status body headers]
-  p/Functor
-  (fmap [_ f]
-    (Result. status (f body) headers))
-  p/Applicative
-  (pure [_ v]
-    (Result. 200 v {}))
-  p/Monad
-  (mreturn [_ v]
-    (Result. 200 v {}))
-  (mbind [_ f]
-    (let [new-result (f body)]
-      (if (instance? Result new-result)
-        new-result
-        (Result. status new-result headers)))))
+;; Helper functions without protocol implementations
+(defrecord Result [status body headers])
 
 (defn success
   ([body] (Result. 200 body {}))
@@ -52,24 +39,7 @@
    :body    (:body result)
    :headers (:headers result)})
 
-(defrecord Pipeline [run-pipeline]
-  p/Functor
-  (fmap [_ f]
-    (Pipeline. (fn [request]
-                 (let [result (run-pipeline request)]
-                   (m/fmap f result)))))
-  p/Applicative
-  (pure [_ v]
-    (Pipeline. (fn [_] (success v))))
-  p/Monad
-  (mreturn [_ v]
-    (Pipeline. (fn [_] (success v))))
-  (mbind [_ f]
-    (Pipeline. (fn [request]
-                 (let [result (run-pipeline request)]
-                   (if (< (:status result) 400)
-                     ((:run-pipeline (f (:body result))) request)
-                     result))))))
+(defrecord Pipeline [run-pipeline])
 
 (defn success? [result]
   (< (:status result) 400))
