@@ -5,6 +5,8 @@ WORKDIR /app
 COPY . /app
 
 RUN clojure -T:build uber
+# Find the generated jar file
+RUN find /app/target -name "*-standalone.jar" -type f -exec cp {} /app/target/church-api-standalone.jar \;
 
 FROM openjdk:11-jre-slim
 

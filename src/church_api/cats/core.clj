@@ -1,9 +1,6 @@
-(ns church-api.cats.core
-  (:require [cats.core :as m]
-            [cats.builtin]
-            [cats.protocols :as p]))
+(ns church-api.cats.core)
 
-;; Helper functions without protocol implementations
+;; Simple record types without protocol implementations
 (defrecord Result [status body headers])
 
 (defn success
@@ -46,3 +43,31 @@
 
 (defn run-pipeline [pipeline request]
   ((:run-pipeline pipeline) request))
+
+;; Simplified functional implementations without protocols
+
+(defn fmap-result [f result]
+  (update result :body f))
+
+(defn pure-result [v]
+  (success v))
+
+(defn bind-result [result f]
+  (let [new-result (f (:body result))]
+    (if (instance? Result new-result)
+      new-result
+      (assoc result :body new-result))))
+
+(defn fmap-pipeline [f pipeline]
+  (Pipeline. (fn [request]
+               (f (run-pipeline pipeline request)))))
+
+(defn pure-pipeline [v]
+  (Pipeline. (fn [_] (success v))))
+
+(defn bind-pipeline [pipeline f]
+  (Pipeline. (fn [request]
+               (let [result (run-pipeline pipeline request)]
+                 (if (instance? Result result)
+                   ((:run-pipeline (f (:body result))) request)
+                   ((:run-pipeline (f result)) request))))))
