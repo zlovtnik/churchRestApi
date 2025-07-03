@@ -26,6 +26,8 @@
         com.taoensso/timbre {:mvn/version "6.5.0"}}
  :aliases {
   :coverage {:extra-deps {cloverage/cloverage {:mvn/version "1.2.4"}}
-             :main-opts ["-m" "cloverage.coverage" "--ns-regex" ".*"]}}
+             :main-opts ["-m" "cloverage.coverage" "--ns-regex" ".*"]}
+  :build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}}
+          :ns-default build}}
  :profiles {:dev {:dependencies [[jonase/eastwood {:mvn/version "1.4.3"}]]}}
  :mvn/repos {"clojars" {:url "https://clojars.org/repo"}}}
