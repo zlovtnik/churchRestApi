@@ -3,7 +3,6 @@
             [church-api.handlers.auth :as auth]
             [church-api.handlers.users :as users]
             [church-api.services.user-service :as user-service]
-            [church-api.security.jwt :as jwt]
             [church-api.cats.middlewares :as mw]
             [church-api.cats.core :as cats]
             [cats.monad.either :as either]
@@ -11,11 +10,10 @@
             [church-api.config :as config]))
 
 ;; Initialize configuration before tests
-(defn setup-config [f]
-  (config/init :test)
-  (f))
-
-(use-fixtures :once setup-config)
+(use-fixtures :once
+  (fn [f]
+    (config/init :test)
+    (f)))
 
 (def test-user-email "realtestuser@example.com")
 (def test-user-password "realpassword123")
@@ -55,8 +53,8 @@
                           ;; Use the proper Either extraction based on branch type
                           :else
                           (let [branch-type (either/branch login-either
-                                                         (fn [left] :left)
-                                                         (fn [right] :right))]
+                                                         (constantly :left)
+                                                         (constantly :right))]
                             (if (= branch-type :right)
                               (either/branch login-either nil identity)
                               (do (println "Login failed:" 

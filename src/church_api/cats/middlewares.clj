@@ -21,8 +21,12 @@
                     (second (re-find #"^Bearer (.+)$" auth-header))
                     ;; For tests that don't format with Bearer prefix
                     auth-header))]
-      (if-let [user (jwt/validate-token token)]
-        (assoc request :user user)  ;; Put user at top level of request
+      (if-let [claims (jwt/validate-token token)]
+        ;; Transform JWT claims to match expected user format
+        (let [user {:id (:user-id claims)
+                    :email (:email claims)
+                    :roles (:roles claims)}]
+          (assoc request :user user))
         {:status 401, :body {:error "Invalid or missing token"}}))))
 
 (defn authorize [required-permission]
