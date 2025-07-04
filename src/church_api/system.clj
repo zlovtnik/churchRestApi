@@ -19,7 +19,9 @@
   :start (jdbc/get-datasource db-spec))
 
 (defn start []
-  (mount/start))
+  (mount/start)
+  nil)
 
 (defn stop []
-  (mount/stop))
+  (mount/stop)
+  nil)

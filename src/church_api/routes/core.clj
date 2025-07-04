@@ -15,7 +15,8 @@
             [church-api.middleware.audit :as audit]
             [church-api.routes.api :as api-routes]
             [church-api.routes.auth :as auth-routes]
-            [church-api.routes.health :as health-routes]))
+            [church-api.routes.health :as health-routes]
+            [church-api.cats.core :as cats-core]))
 
 (defroutes app-routes
   (context "/api" []
@@ -44,4 +45,5 @@
       (logging/wrap-logging)
       (wrap-json-body {:keywords? true})
       (wrap-json-response)
-      (wrap-defaults (assoc api-defaults :security {:anti-forgery false}))))
+      (wrap-defaults (assoc api-defaults :security {:anti-forgery false}))
+      (cats-core/wrap-either->response)))

@@ -1,5 +1,6 @@
 (ns church-api.cats.middlewares
   (:require [cats.core :as m]
+            [cats.monad.either :as either]
             [church-api.cats.core :as cats]
             [church-api.security.jwt :as jwt]
             [church-api.security.permissions :as permissions]
@@ -13,43 +14,43 @@
   false)
 
 (defn authenticate []
-  (cats/->Pipeline
-    (fn [request]
-      (let [token (get-in request [:headers "authorization"])]
-        (if-let [user (jwt/validate-token token)]
-          (cats/success (assoc request :user user))
-          (cats/unauthorized {:error "Invalid or missing token"}))))))
+  (fn [request]
+    (let [auth-header (get-in request [:headers "authorization"])
+          token (when auth-header
+                  (if (re-find #"^Bearer " auth-header)
+                    (second (re-find #"^Bearer (.+)$" auth-header))
+                    ;; For tests that don't format with Bearer prefix
+                    auth-header))]
+      (if-let [user (jwt/validate-token token)]
+        (assoc request :user user)  ;; Put user at top level of request
+        {:status 401, :body {:error "Invalid or missing token"}}))))
 
 (defn authorize [required-permission]
-  (cats/->Pipeline
-    (fn [request]
-      (let [user (:user request)]
-        (if (permissions/has-permission? user required-permission)
-          (cats/success request)
-          (cats/forbidden {:error "Insufficient permissions"}))))))
+  (fn [request]
+    (let [user (:user request)]
+      (if (permissions/has-permission? user required-permission)
+        (either/right request)
+        (either/left {:status 403 :error "Insufficient permissions"})))))
 
 (defn validate-input [schema]
-  (cats/->Pipeline
-    (fn [request]
-      (let [body (:body request)]
-        (m/bind (validation/validate-with-either schema body)
-                (fn [validated-data]
-                  (cats/success (assoc request :validated-body validated-data))))))))
+  (fn [request]
+    (let [body (:body request)]
+      (m/bind (validation/validate-with-either schema body)
+              (fn [validated-data]
+                (either/right (assoc request :validated-body validated-data)))))))
 
 (defn rate-limit [limit window]
-  (cats/->Pipeline
-    (fn [request]
-      (let [client-id (get-client-id request)]
-        (if (rate-limit-exceeded? client-id limit window)
-          (cats/->Result 429 {:error "Rate limit exceeded"} {"Retry-After" (str window)})
-          (cats/success request))))))
+  (fn [request]
+    (let [client-id (get-client-id request)]
+      (if (rate-limit-exceeded? client-id limit window)
+        (either/left {:status 429 :error "Rate limit exceeded" :headers {"Retry-After" (str window)}})
+        (either/right request)))))
 
 (defn compose-middleware [& middlewares]
   (reduce (fn [acc middleware]
-            (cats/->Pipeline
-              (fn [request]
-                (m/bind (cats/run-pipeline acc request)
-                        (fn [processed]
-                          (cats/run-pipeline middleware processed))))))
-          (cats/->Pipeline (fn [request] (cats/success request)))
+            (fn [request]
+              (m/bind (acc request)
+                      (fn [processed]
+                        (middleware processed)))))
+          (fn [request] (either/right request))
           middlewares))

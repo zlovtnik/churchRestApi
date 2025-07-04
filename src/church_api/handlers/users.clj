@@ -4,17 +4,19 @@
             [church-api.validation.schemas.user :as user-validation]
             [church-api.security.permissions :as permissions]
             [church-api.security.audit :as audit]
-            [church-api.logging :as logging]))
+            [church-api.logging :as logging]
+            [church-api.cats.core :as cats]
+            [cats.monad.either :as either]))
 
 (defn get-users [request]
   (let [user (get-in request [:user])]
     (logging/log-info (str "Getting users list for user: " (:id user)))
     (if (permissions/has-permission? user :read-users)
       (let [users (user-service/get-all-users)]
-        (response/response (map #(dissoc % :password-hash) users)))
+        (either/right (map #(dissoc % :password-hash) users)))
       (do
         (logging/log-error {:context "get-users" :user-id (:id user)} "Insufficient permissions")
-        (response/status 403 {:error "Insufficient permissions"})))))
+        (either/left {:status 403 :error "Insufficient permissions"})))))
 
 (defn get-user [request]
   (let [user-id (get-in request [:params :id])

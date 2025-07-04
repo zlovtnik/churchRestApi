@@ -5,7 +5,9 @@
             [church-api.config :as config]))
 
 (defn- get-secret []
-  (config/get-config :jwt :secret))
+  (let [secret (config/get-config :jwt :secret)]
+    (println "[DEBUG] JWT secret in use:" secret)
+    secret))
 
 (defn generate-token [user]
   (let [exp (time/plus (time/now) (time/hours 1))
