@@ -1,7 +1,10 @@
-(ns church-api.cats.core)
+(ns church-api.cats.core
+  (:require [cats.protocols :as p]))
 
 ;; Simple record types without protocol implementations
-(defrecord Result [status body headers])
+(defrecord Result [status body headers]
+  p/Printable
+  (-repr [this] (str "#Result{" (:status this) " " (:body this) " " (:headers this) "}")))
 
 (defn success
   ([body] (Result. 200 body {}))

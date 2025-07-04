@@ -6,20 +6,29 @@
             [church-api.security.audit :as audit]))
 
 (defn login [request]
-  (let [credentials (get-in request [:body])]
-    (if-let [errors (user-validation/validate-login credentials)]
-      (response/bad-request {:errors errors})
-      (if-let [user (auth/authenticate credentials)]
-        (let [token (jwt/generate-token user)
-              refresh-token (jwt/generate-refresh-token user)]
-          (audit/log-authentication-success user request)
-          (response/response {:token token
-                             :refresh-token refresh-token
-                             :user (dissoc user :password-hash)
-                             :expires-in 3600}))
-        (do
-          (audit/log-authentication-failure credentials request)
-          (response/status 401 {:error "Invalid credentials"}))))))
+  (println "LOGIN HANDLER CALLED with" (pr-str request))
+  (try
+    (let [credentials (get-in request [:body])]
+      (println "LOGIN credentials:" (pr-str credentials))
+      (if-let [errors (user-validation/validate-login credentials)]
+        (do (println "LOGIN validation errors:" (pr-str errors))
+            (response/bad-request {:errors errors}))
+        (if-let [user (auth/authenticate credentials)]
+          (let [token (jwt/generate-token user)
+                refresh-token (jwt/generate-refresh-token user)]
+            (audit/log-authentication-success user request)
+            (println "LOGIN success for user:" (:email user))
+            (response/response {:token token
+                               :refresh-token refresh-token
+                               :user (dissoc user :password-hash)
+                               :expires-in 3600}))
+          (do
+            (audit/log-authentication-failure credentials request)
+            (println "LOGIN failed: Invalid credentials")
+            (response/status 401 {:error "Invalid credentials"})))))
+    (catch Exception e
+      (println "LOGIN ERROR:" (.getMessage e))
+      (throw e))))
 
 (defn refresh-token [request]
   (let [auth-header (get-in request [:headers "authorization"])

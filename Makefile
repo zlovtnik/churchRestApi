@@ -17,11 +17,11 @@ build: aot
 
 # Run in production mode using the built jar
 prod: build
-	java -cp church-api.jar clojure.main -m church-api.core
+	clojure -M -m church-api.core
 
 # Run tests (adjust namespaces as needed)
 test:
-	clojure -M -e "(require 'church-api.handlers.users-test 'church-api.routes.api-test 'church-api.routes.health-test 'church-api.routes.users-test 'church-api.server-test 'church-api.system-test) (require 'clojure.test) (clojure.test/run-all-tests #\"church-api.*-test\")"
+	clojure -M:test -e "(doseq [ns '[church-api.cats.core-test church-api.cats.middlewares-test church-api.cats.validation-test church-api.core-test church-api.handlers.auth-test church-api.handlers.users-test church-api.integration.auth-real-test church-api.middleware.audit-test church-api.middleware.authorization-test church-api.routes.api-test church-api.routes.health-test church-api.routes.users-test church-api.server-test church-api.services.user-service-test church-api.system-test]] (require ns)) (clojure.test/run-all-tests)"
 
 # Run tests with coverage
 coverage:

@@ -6,4 +6,4 @@
   (testing "Audit logging middleware logs request and response"
     (let [request {:request-method :get :uri "/api/test"}
           handler (fn [_] {:status 200 :body "OK"})]
-      (is (= 200 (:status (wrap-audit-logging handler request)))))))
+      (is (= 200 (:status ((wrap-audit-logging handler) request)))))))

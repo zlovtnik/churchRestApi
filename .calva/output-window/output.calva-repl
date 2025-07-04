@@ -1,0 +1,109 @@
+; This is the Calva REPL Window.
+; It's just a file, really, with some special treatment from Calva.
+; Use it as a REPL input prompt if you like. (When the REPL is connected.)
+; TIPS: The keyboard shortcut `ctrl+alt+o r` shows and focuses this window
+; Please see https://calva.io/repl-window/ for more info.
+; Happy coding! ♥️
+
+; TIPS: As with any Clojure file when the REPL is connected:
+; - `alt+enter` evaluates the current top level form.
+; - `ctrl+enter` evaluates the current form.
+; Special for this file:
+; - `alt+up` and `alt+down` traverse up and down the REPL command history
+;    when the cursor is after the last contents at the prompt
+; 
+; See also the Calva Inspector: https://calva.io/inspector/
+
+PLEASE NOTE
+We will update the default location of this file.
+The new default location will be
+  "<projectRootPath>/.calva/repl.calva-repl"
+For now the legacy path is used by default.
+To give yourself a smooth transition, you can opt in
+to the change, by configuring this setting as false:
+  "calva.useLegacyReplWindowPath"
+and then add "**/.calva/repl.calva-repl" to your ".gitignore" file.
+
+
+This file is configured as the output destination for all REPL output.
+You can configure this with the setting:
+  "calva.outputDestinations"
+
+
+; Jacking in...
+; Connecting using "deps.edn" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+
+; Starting Jack-in: (cd /Users/rcs/git/44/churchRestApi; clojure -Sdeps '{:deps {nrepl/nrepl {:mvn/version,"1.3.1"},cider/cider-nrepl {:mvn/version,"0.55.4"}}}' -M -m nrepl.cmdline --middleware "[cider.nrepl/cider-middleware]")
+; Using host:port localhost:51642 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉user꞉> 
+"Please see https://calva.io/output/#about-stdout-in-the-repl-window
+about why stdout printed to this file is prepended with `;` to be line comments."
+clj꞉user꞉> 
+; Jack-in done.
+clj꞉user꞉> 
+#'church-api.auth.core/authenticate
+clj꞉church-api.auth.core꞉> 
+; Syntax error compiling at (src/church_api/auth/core.clj:0:0).
+; Unable to resolve symbol: user in this context
+clj꞉church-api.auth.core꞉> 
+; Syntax error compiling at (src/church_api/cats/middlewares.clj:0:0).
+; Unable to resolve symbol: authenticate in this context
+clj꞉church-api.cats.middlewares꞉> 
+#'church-api.cats.middlewares/authenticate
+clj꞉church-api.cats.middlewares꞉> 
+#function[church-api.cats.middlewares/authenticate]
+clj꞉church-api.cats.middlewares꞉> 
+#'church-api.cats.middlewares/authenticate
+clj꞉church-api.cats.middlewares꞉> 
+#'church-api.cats.middlewares/authenticate
+clj꞉church-api.cats.middlewares꞉> 
+
+#'church-api.cats.middlewares/authorize
+clj꞉church-api.cats.middlewares꞉> clj:user꞉> 
+; Syntax error compiling at (.calva/output-window/output.calva-repl:0:0).
+; Unable to resolve symbol:   in this context
+clj꞉church-api.cats.middlewares꞉> 
+
+
+
+
+
+;; Let's debug the login authentication route.
+;; We'll manually call the authenticate function with some test credentials.
+
+(require '[church-api.auth.core :as auth])
+
+
+;; Example credentials (replace with actual test values as needed)
+(def test-credentials {:email "test@example.com" :password "password123"})
+
+
+;; Call the authenticate function and print the result
+(println "Auth result:" (auth/authenticate test-credentials))
+; Syntax error compiling at (.calva/output-window/output.calva-repl:87:25).
+; No such namespace: auth
+clj꞉church-api.cats.middlewares꞉> 
+; Syntax error compiling at (.calva/output-window/output.calva-repl:89:25).
+; No such namespace: auth
+clj꞉church-api.cats.middlewares꞉> 
+
+
+;; Let's try requiring the correct namespace and calling the authenticate function again.
+
+(require '[church-api.auth.core :refer [authenticate]])
+
+
+(def test-credentials {:email "test@example.com" :password "password123"})
+
+
+(println "Auth result:" (authenticate test-credentials))
+; Syntax error compiling at (.calva/output-window/output.calva-repl:106:25).
+; Unable to resolve symbol: test-credentials in this context
+clj꞉church-api.cats.middlewares꞉> 
